@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="tr" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zeus Market - Doğal Lezzetler ve Hızlı Teslimat</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Alpine.js CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            zeus: {
+              green: '#07C158',
+              greenHover: '#059e47',
+              dark: '#032611',
+              card: '#0a3a1f',
+              accent: '#3bf088',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #032611;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #0b542b;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #07C158;
+    }
+    .emerald-glow {
+      box-shadow: 0 0 15px rgba(7, 193, 88, 0.35);
+    }
+    .emerald-border-glow:focus {
+      box-shadow: 0 0 10px rgba(7, 193, 88, 0.5);
+    }
+  </style>
+</head>
+<body class="min-h-full flex flex-col font-sans antialiased bg-gradient-to-b from-[#1E2421] via-[#666B68] to-[#CCCFCD] text-slate-100 selection:bg-[#07C158] selection:text-slate-900" x-data="zeusApp()" x-init="initApp()">
+
+  <!-- Hidden global file input for table image click -->
+  <input type="file" id="tableFileInput" class="hidden" accept="image/*" @change="handleTableFileChange($event)">
+
+  <!-- HEADER / NAVBAR -->
+  <header class="sticky top-0 z-40 bg-[#1A211D]/90 backdrop-blur-md border-b border-emerald-900/40 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- LOGO & TITLE -->
+        <div class="flex items-center gap-3 cursor-pointer" @click="currentTab = 'shop'">
+          <div class="relative w-12 h-12 rounded-xl bg-gradient-to-br from-[#3bf088] via-[#07C158] to-[#032611] p-0.5 shadow-lg shadow-[#07C158]/30 flex items-center justify-center group hover:scale-105 transition-transform">
+            <div class="w-full h-full bg-[#032611] rounded-[10px] flex items-center justify-center overflow-hidden p-1.5">
+              <!-- Provided Leaf/Trefoil Logo SVG -->
+              <svg class="w-full h-full text-[#07C158] group-hover:scale-110 transition-transform duration-300 fill-current" viewBox="0 0 970 871">
+                <path d="M 485 0 C 440 0 400 40 400 90 C 400 150 445 190 485 230 C 525 190 570 150 570 90 C 570 40 530 0 485 0 Z M 320 0 C 180 0 0 100 0 240 C 0 380 180 450 320 450 C 370 450 420 410 440 370 C 400 310 380 230 380 180 C 380 120 420 60 485 60 C 420 20 370 0 320 0 Z M 650 0 C 600 0 550 20 485 60 C 550 60 590 120 590 180 C 590 230 570 310 530 370 C 550 410 600 450 650 450 C 790 450 970 380 970 240 C 970 100 790 0 650 0 Z M 485 380 C 430 380 390 420 350 470 C 310 520 230 630 230 720 C 230 800 340 871 485 871 C 630 871 740 800 740 720 C 740 630 660 520 620 470 C 580 420 540 380 485 380 Z" fill-rule="evenodd"/>
+                <path d="M 485 220 C 420 170 300 20 180 20 C 80 20 10 90 10 200 C 10 330 150 430 310 430 C 390 430 430 380 445 350 C 400 420 240 560 240 700 C 240 800 350 860 485 860 C 620 860 730 800 730 700 C 730 560 570 420 525 350 C 540 380 580 430 660 430 C 820 430 960 330 960 200 C 960 90 890 20 790 20 C 670 20 550 170 485 220 Z"/>
+              </svg>
+            </div>
+          </div>
+          <div>
+            <span class="text-2xl font-extrabold tracking-wider bg-gradient-to-r from-[#3bf088] via-[#07C158] to-emerald-200 bg-clip-text text-transparent">ZEUS</span>
+            <span class="text-2xl font-light text-slate-100 tracking-wide">MARKET</span>
+            <p class="text-[10px] text-[#3bf088]/90 font-medium tracking-widest uppercase -mt-1">Hızlı Teslimat</p>
+          </div>
+        </div>
+
+        <!-- SEARCH BAR (Müşteri Modu) -->
+        <div class="hidden md:flex flex-1 max-w-md mx-8" x-show="currentTab === 'shop'">
+          <div class="relative w-full">
+            <input 
+              type="text" 
+              x-model="searchQuery" 
+              placeholder="Market genelinde ürün ara..." 
+              class="w-full bg-[#05371a]/80 text-sm text-slate-100 placeholder-emerald-200/50 rounded-xl px-4 py-2.5 pl-10 border border-emerald-800/60 focus:outline-none focus:border-[#07C158] transition-all emerald-border-glow"
+            >
+            <svg class="w-5 h-5 text-emerald-300/70 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <button x-show="searchQuery" @click="searchQuery = ''" class="absolute right-3 top-2.5 text-slate-400 hover:text-white">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- MODE BUTTONS & CART TRIGGER -->
+        <div class="flex items-center gap-3">
+          <!-- Mod Değiştir / Yönetici Paneline Geçiş -->
+          <template x-if="!isAdmin">
+            <button 
+              @click="openAdminAuthModal()" 
+              class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#05371a] hover:bg-[#084923] text-[#3bf088] border border-[#07C158]/30 hover:border-[#07C158]/70 transition-all shadow-sm"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+              <span>Yönetici Girişi</span>
+            </button>
+          </template>
+
+          <template x-if="isAdmin">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[#07C158]/20 text-[#3bf088] border border-[#07C158]/40">
+                <span class="w-2 h-2 rounded-full bg-[#07C158] mr-1.5 animate-pulse"></span> Yönetici Modu
+              </span>
+              <button 
+                @click="logoutAdmin()" 
+                class="px-3 py-2 rounded-xl text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all"
+                title="Yönetici Modundan Çık"
+              >
+                Çıkış
+              </button>
+            </div>
+          </template>
+
+          <!-- Navigation Tab Switching for Admin -->
+          <template x-if="isAdmin">
+            <div class="flex bg-[#05371a] p-1 rounded-xl border border-emerald-800 text-xs">
+              <button 
+                @click="currentTab = 'shop'" 
+                :class="currentTab === 'shop' ? 'bg-[#07C158] text-slate-950 font-bold' : 'text-slate-300 hover:text-white'"
+                class="px-3 py-1.5 rounded-lg transition-all"
+              >
+                Mağaza
+              </button>
+              <button 
+                @click="currentTab = 'admin'" 
+                :class="currentTab === 'admin' ? 'bg-[#07C158] text-slate-950 font-bold' : 'text-slate-300 hover:text-white'"
+                class="px-3 py-1.5 rounded-lg transition-all relative"
+              >
+                Yönetim
+                <span x-show="pendingOrdersCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold" x-text="pendingOrdersCount"></span>
+              </button>
+            </div>
+          </template>
+        </div>
+
+      </div>
+      
+      <!-- Mobile Search Bar -->
+      <div class="pb-3 md:hidden" x-show="currentTab === 'shop'">
+        <div class="relative w-full">
+          <input 
+            type="text" 
+            x-model="searchQuery" 
+            placeholder="Market genelinde ürün ara..." 
+            class="w-full bg-[#05371a] text-sm text-slate-100 placeholder-emerald-200/50 rounded-xl px-4 py-2 pl-9 border border-emerald-800 focus:outline-none focus:border-[#07C158]"
+          >
+          <svg class="w-4 h-4 text-emerald-300/70 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28">
+
+    <!-- CLIENT SHOP VIEW -->
+    <div x-show="currentTab === 'shop'" class="space-y-6">
+
+      <!-- CATEGORY NAV / FILTER DROPDOWN MENU -->
+      <section class="relative z-30" x-data="{ isCatOpen: false }" @click.outside="isCatOpen = false">
+        <div class="flex items-center gap-3">
+          <!-- Kategoriler Ana Butonu -->
+          <button 
+            @click="isCatOpen = !isCatOpen" 
+            class="px-5 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-[#07C158] to-[#059e47] text-slate-950 flex items-center gap-3 shadow-lg shadow-[#07C158]/30 hover:from-[#3bf088] hover:to-[#07C158] transition-all active:scale-95"
+          >
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+              <span>Kategoriler</span>
+            </div>
+            <!-- Seçili Kategori Etiketi -->
+            <span class="text-xs bg-slate-950/20 text-slate-950 px-2 py-0.5 rounded-md font-semibold" x-text="selectedCategory"></span>
+            <!-- Ok İkonu -->
+            <svg class="w-4 h-4 transition-transform duration-200" :class="isCatOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+
+          <!-- Aktif Filtre İptal Butonu (Tümü dışında bir şey seçilince çıkar) -->
+          <template x-if="selectedCategory !== 'Tümü'">
+            <button 
+              @click="selectedCategory = 'Tümü'" 
+              class="text-xs text-[#3bf088] hover:text-white bg-[#043317]/80 hover:bg-[#054921] px-3 py-3 rounded-xl border border-emerald-700/60 flex items-center gap-1 transition-all"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              <span>Filtreyi Kaldır</span>
+            </button>
+          </template>
+        </div>
+
+        <!-- Dropdown Liste Menüsü -->
+        <div 
+          x-show="isCatOpen" 
+          x-transition:enter="transition ease-out duration-200 transform opacity-0 -translate-y-2"
+          x-transition:enter-start="opacity-0 -translate-y-2"
+          x-transition:enter-end="opacity-100 translate-y-0"
+          x-transition:leave="transition ease-in duration-150 transform opacity-100 translate-y-0"
+          x-transition:leave-start="opacity-100 translate-y-0"
+          x-transition:leave-end="opacity-0 -translate-y-2"
+          class="absolute left-0 mt-2 w-72 bg-[#042d14]/95 border border-emerald-700/80 rounded-2xl shadow-2xl backdrop-blur-xl py-2 overflow-hidden z-50 divide-y divide-emerald-800/50"
+          x-cloak
+        >
+          <!-- Tümü Seçeneği -->
+          <div class="p-1">
+            <button 
+              @click="selectedCategory = 'Tümü'; isCatOpen = false" 
+              :class="selectedCategory === 'Tümü' ? 'bg-[#07C158]/20 text-[#3bf088] font-bold border-l-4 border-[#07C158]' : 'text-slate-100 hover:bg-[#075928]/60'"
+              class="w-full text-left px-4 py-2.5 rounded-xl text-xs flex items-center justify-between transition-colors"
+            >
+              <span class="flex items-center gap-2.5">
+                <span>🌿</span>
+                <span>Tümü</span>
+              </span>
+              <span class="text-[11px] px-2 py-0.5 rounded-full bg-[#021a0c]/60 text-emerald-300" x-text="products.length"></span>
+            </button>
+          </div>
+
+          <!-- Kategoriler Listesi -->
+          <div class="p-1 max-h-80 overflow-y-auto space-y-0.5">
+            <template x-for="cat in categories" :key="cat.id">
+              <div>
+                <!-- Ana Kategori Butonu -->
+                <button 
+                  @click="if (cat.subcategories) { cat.isOpen = !cat.isOpen; } else { selectedCategory = cat.name; isCatOpen = false; }" 
+                  :class="selectedCategory === cat.name ? 'bg-[#07C158]/20 text-[#3bf088] font-bold border-l-4 border-[#07C158]' : 'text-slate-100 hover:bg-[#075928]/60'"
+                  class="w-full text-left px-4 py-2.5 rounded-xl text-xs flex items-center justify-between transition-colors"
+                >
+                  <span class="flex items-center gap-2.5">
+                    <span x-text="cat.icon"></span>
+                    <span x-text="cat.name"></span>
+                  </span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[11px] px-2 py-0.5 rounded-full bg-[#021a0c]/60 text-emerald-300" x-text="getCategoryCount(cat.name)"></span>
+                    <template x-if="cat.subcategories">
+                      <svg class="w-3.5 h-3.5 transition-transform duration-200 text-emerald-400" :class="cat.isOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                      </svg>
+                    </template>
+                  </div>
+                </button>
+
+                <!-- Alt Kategoriler (Varsa) -->
+                <template x-if="cat.subcategories && cat.isOpen">
+                  <div class="pl-6 pr-1 py-1 space-y-1 bg-[#021a0c]/40 rounded-xl my-1 border-l-2 border-emerald-700/50">
+                    <template x-for="sub in cat.subcategories" :key="sub">
+                      <button 
+                        @click="selectedCategory = sub; isCatOpen = false" 
+                        :class="selectedCategory === sub ? 'bg-[#07C158]/30 text-[#3bf088] font-bold' : 'text-emerald-100/90 hover:bg-[#075928]/40'"
+                        class="w-full text-left px-3 py-1.5 rounded-lg text-[11px] flex items-center justify-between transition-colors"
+                      >
+                        <span x-text="'↳ ' + sub"></span>
+                        <span class="text-[10px] px-1.5 py-0.2 rounded bg-[#032611] text-emerald-300" x-text="getCategoryCount(sub)"></span>
+                      </button>
+                    </template>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </div>
+      </section>
+
+      <!-- BANNER / HERO SLIDER -->
+      <section class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#1E2421] via-[#353D38] to-[#7E7E7E]/50 border border-emerald-800/50 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+        <div class="space-y-2 text-center w-full flex flex-col items-center z-10">
+          <span class="inline-block px-3 py-1 rounded-full bg-[#07C158]/20 text-[#3bf088] border border-[#07C158]/40 text-xs font-semibold tracking-wider uppercase">
+            🌱 Taze Ürünler & Hızlı Teslimat
+          </span>
+          <h1 class="text-2xl md:text-3xl font-extrabold text-white text-center">Taze ve Kaliteli Ürünler <span class="text-[#3bf088]">Kapınızda!</span></h1>
+          <p class="text-emerald-100/90 text-sm max-w-lg text-center">Zeus Market ayrıcalığıyla Unlu Mamüllerden İçeceklere binlerce çeşit ürünü anında sipariş verin.</p>
+        </div>
+        <div class="relative z-10 flex-shrink-0">
+          <div class="px-6 py-4 rounded-xl bg-[#032611]/85 border border-[#07C158]/40 backdrop-blur-md text-center emerald-glow">
+            <span class="block text-xs text-emerald-200/80">Minimum Sipariş Tutarı</span>
+            <span class="text-2xl font-black text-[#3bf088]">250.00 ₺</span>
+          </div>
+        </div>
+        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-[#07C158]/20 rounded-full blur-3xl pointer-events-none"></div>
+      </section>
+
+      <!-- PRODUCTS GRID -->
+      <section>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+            <span x-text="selectedCategory === 'Tümü' ? 'Tüm Ürünler' : selectedCategory"></span>
+            <span class="text-xs text-emerald-200/80 font-normal" x-text="'(' + filteredProducts.length + ' Ürün)'"></span>
+          </h2>
+        </div>
+
+        <!-- No Products Empty State -->
+        <div x-show="filteredProducts.length === 0" class="text-center py-16 bg-[#042d14]/60 rounded-2xl border border-emerald-800/60">
+          <svg class="w-16 h-16 text-emerald-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+          </svg>
+          <p class="text-emerald-100/80 font-medium">Aramanıza uygun ürün bulunamadı.</p>
+          <button @click="selectedCategory = 'Tümü'; searchQuery = ''" class="mt-3 text-xs text-[#3bf088] hover:underline">Filtreleri Temizle</button>
+        </div>
+
+        <!-- Grid Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <template x-for="product in filteredProducts" :key="product.id">
+            <div class="bg-[#042d14]/80 backdrop-blur-sm rounded-2xl border border-emerald-800/60 p-3 flex flex-col justify-between hover:border-[#07C158] transition-all hover:shadow-xl group relative">
+              
+              <!-- Category Badge -->
+              <span class="absolute top-2 right-2 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#02160a]/90 text-[#3bf088] border border-emerald-800">
+                <span x-text="product.unit"></span>
+              </span>
+
+              <div>
+                <!-- Image Container -->
+                <div class="w-full h-32 rounded-xl bg-[#021a0c]/80 overflow-hidden mb-3 flex items-center justify-center p-2 relative group-hover:scale-105 transition-transform duration-300">
+                  <img :src="product.image" :alt="product.name" class="max-h-full max-w-full object-contain" onerror="this.src='https://placehold.co/200x200/032611/07C158?text=Zeus+Market'">
+                </div>
+
+                <!-- Product Info -->
+                <span class="text-[11px] text-emerald-200/70 font-medium" x-text="product.category"></span>
+                <h3 class="text-sm font-semibold text-slate-100 line-clamp-1 group-hover:text-[#3bf088] transition-colors" x-text="product.name"></h3>
+              </div>
+
+              <div class="mt-3 pt-2 border-t border-emerald-800/40 space-y-2">
+                <!-- Gramaj Seçimi (Sadece Açık Çerezler / Gramajlı ürünler için) -->
+                <template x-if="product.isWeightProduct">
+                  <div class="bg-[#02160a]/90 p-1.5 rounded-xl border border-emerald-800/80">
+                    <label class="block text-[10px] text-emerald-300 font-semibold mb-1 flex justify-between">
+                      <span>Gramaj Seçin:</span>
+                      <span class="text-[#3bf088] font-bold" x-text="getProductGrammage(product.id) + ' g'"></span>
+                    </label>
+                    <div class="grid grid-cols-4 gap-1 mb-1.5">
+                      <template x-for="g in [100, 250, 500, 1000]" :key="g">
+                        <button 
+                          @click="setProductGrammage(product.id, g)" 
+                          :class="getProductGrammage(product.id) === g ? 'bg-[#07C158] text-slate-950 font-bold' : 'bg-[#05371a] text-emerald-200 hover:bg-[#075928]'"
+                          class="py-0.5 rounded text-[10px] transition-colors"
+                          x-text="g >= 1000 ? (g/1000) + 'kg' : g + 'g'"
+                        ></button>
+                      </template>
+                    </div>
+                    <!-- Özel Gramaj Girdisi -->
+                    <div class="relative">
+                      <input 
+                        type="number" 
+                        step="50" 
+                        min="50" 
+                        :value="getProductGrammage(product.id)" 
+                        @input="setProductGrammage(product.id, parseInt($event.target.value) || 100)"
+                        class="w-full bg-[#032611] text-[11px] text-white rounded-lg px-2 py-1 pr-6 border border-emerald-700/80 focus:outline-none focus:border-[#07C158]"
+                        placeholder="Özel gramaj..."
+                      >
+                      <span class="absolute right-2 top-1 text-[10px] text-emerald-400 font-semibold">g</span>
+                    </div>
+                  </div>
+                </template>
+
+                <div class="flex items-center justify-between">
+                  <div>
+                    <span class="text-lg font-black text-[#3bf088]" x-text="formatPrice(calculateProductPrice(product))"></span>
+                    <span class="text-xs text-[#3bf088]">₺</span>
+                    <template x-if="product.isWeightProduct">
+                      <span class="block text-[9px] text-emerald-300/60" x-text="'(' + formatPrice(product.price) + ' ₺/kg)'"></span>
+                    </template>
+                  </div>
+
+                  <!-- Cart Action Controls -->
+                  <div>
+                    <template x-if="getItemQty(product.id) === 0">
+                      <button 
+                        @click="addToCart(product)" 
+                        class="w-9 h-9 rounded-xl bg-[#07C158] hover:bg-[#3bf088] text-slate-950 font-bold flex items-center justify-center transition-all shadow-md shadow-[#07C158]/30 active:scale-95"
+                        title="Sepete Ekle"
+                      >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                        </svg>
+                      </button>
+                    </template>
+
+                    <template x-if="getItemQty(product.id) > 0">
+                      <div class="flex items-center bg-[#02160a] rounded-xl border border-[#07C158]/50 p-0.5">
+                        <button 
+                          @click="removeFromCart(product.id)" 
+                          class="w-7 h-7 rounded-lg bg-[#05371a] text-[#3bf088] hover:bg-[#084923] flex items-center justify-center transition-colors font-bold"
+                        >-</button>
+                        <span class="w-6 text-center text-xs font-bold text-[#3bf088]" x-text="getItemQty(product.id)"></span>
+                        <button 
+                          @click="addToCart(product)" 
+                          class="w-7 h-7 rounded-lg bg-[#07C158] text-slate-950 hover:bg-[#3bf088] flex items-center justify-center transition-colors font-bold"
+                        >+</button>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          </template>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ADMIN PANEL VIEW -->
+    <div x-show="currentTab === 'admin'" class="space-y-8">
+      
+      <!-- Admin Header Banner -->
+      <div class="bg-gradient-to-r from-[#032611] to-[#07C158]/30 p-6 rounded-2xl border border-[#07C158]/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
+        <div>
+          <h1 class="text-2xl font-extrabold text-white flex items-center gap-2">
+            <span>⚙️ Zeus Market Yönetici Paneli</span>
+          </h1>
+          <p class="text-sm text-emerald-100/80 mt-1">Ürün kataloğunu güncelleyin, resimlere tıklayarak lokal görsel yükleyin ve siparişleri yönetin.</p>
+        </div>
+
+        <div class="flex gap-2">
+          <button 
+            @click="adminTab = 'products'" 
+            :class="adminTab === 'products' ? 'bg-[#07C158] text-slate-950 font-bold' : 'bg-[#042d14] text-slate-200 hover:text-white'"
+            class="px-4 py-2 rounded-xl text-xs transition-all"
+          >
+            Ürün Kataloğu (<span x-text="products.length"></span>)
+          </button>
+          <button 
+            @click="adminTab = 'orders'" 
+            :class="adminTab === 'orders' ? 'bg-[#07C158] text-slate-950 font-bold' : 'bg-[#042d14] text-slate-200 hover:text-white'"
+            class="px-4 py-2 rounded-xl text-xs transition-all relative"
+          >
+            Gelen Siparişler (<span x-text="orders.length"></span>)
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 1: PRODUCT MANAGEMENT -->
+      <div x-show="adminTab === 'products'" class="space-y-6">
+        
+        <!-- Add / Edit Product Form -->
+        <div class="bg-[#042d14]/90 rounded-2xl border border-emerald-800 p-5 shadow-xl">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-base font-bold text-[#3bf088] flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span x-text="isEditing ? 'Ürün Düzenle' : 'Yeni Ürün Ekle'"></span>
+            </h2>
+            <button 
+              x-show="isEditing" 
+              @click="cancelEdit()" 
+              class="text-xs text-slate-300 hover:text-white px-3 py-1 bg-[#075928] rounded-lg transition-colors"
+            >
+              İptal / Yeni Ekle Moduna Dön
+            </button>
+          </div>
+
+          <form @submit.prevent="saveProduct()" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+            <div>
+              <label class="block text-xs text-emerald-200/80 mb-1">Ürün Adı *</label>
+              <input type="text" x-model="productForm.name" required placeholder="Örn: Köy Ekmeği" class="w-full bg-[#02160a] border border-emerald-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#07C158]">
+            </div>
+
+            <div>
+              <label class="block text-xs text-emerald-200/80 mb-1">Kategori *</label>
+              <select x-model="productForm.category" required class="w-full bg-[#02160a] border border-emerald-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#07C158]">
+                <template x-for="cat in allSelectableCategories" :key="cat">
+                  <option :value="cat" x-text="cat"></option>
+                </template>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs text-emerald-200/80 mb-1">Fiyat (₺) *</label>
+              <input type="number" step="0.01" x-model="productForm.price" required placeholder="12.50" class="w-full bg-[#02160a] border border-emerald-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#07C158]">
+              <span class="text-[10px] text-emerald-400" x-show="productForm.category === 'Açık Çerezler'">Kg Fiyatı Giriniz</span>
+            </div>
+
+            <div>
+              <label class="block text-xs text-emerald-200/80 mb-1">Birim (Adet, Kg, Gram)</label>
+              <input type="text" x-model="productForm.unit" required placeholder="Adet veya Kg" class="w-full bg-[#02160a] border border-emerald-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#07C158]">
+            </div>
+
+            <!-- Image File Upload / URL Input -->
+            <div>
+              <label class="block text-xs text-emerald-200/80 mb-1">Ürün Görseli</label>
+              <div class="flex items-center gap-1.5">
+                <label class="flex-1 cursor-pointer bg-[#02160a] hover:bg-[#075928] border border-emerald-800 rounded-xl px-2.5 py-1.5 text-[11px] text-[#3bf088] font-medium truncate text-center transition-colors">
+                  <span>📁 PC'den Resim Seç</span>
+                  <input type="file" accept="image/*" class="hidden" @change="uploadFormImage($event)">
+                </label>
+              </div>
+              <input type="text" x-model="productForm.image" placeholder="URL veya dosya seçin" class="w-full mt-1 bg-[#02160a] border border-emerald-800 rounded-xl px-2.5 py-1 text-[10px] text-emerald-200/70 focus:outline-none focus:border-[#07C158]">
+            </div>
+
+            <div class="sm:col-span-2 lg:col-span-1 flex items-end">
+              <button 
+                type="submit" 
+                :class="isEditing ? 'bg-amber-500 hover:bg-amber-400 shadow-amber-500/20' : 'bg-[#07C158] hover:bg-[#3bf088] shadow-[#07C158]/30'"
+                class="w-full text-slate-950 font-bold py-2 px-4 rounded-xl text-xs transition-all shadow-md"
+                x-text="isEditing ? '✔ Güncelle' : '+ Ürün Kaydet'"
+              >
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Product Table -->
+        <div class="bg-[#042d14]/90 rounded-2xl border border-emerald-800 overflow-hidden shadow-xl">
+          <div class="px-5 py-4 border-b border-emerald-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="font-bold text-sm text-slate-200">Mevcut Ürün Kataloğu <span class="text-xs font-normal text-[#3bf088] ml-2">(Resme tıklayarak direkt PC'den yeni görsel yükleyebilirsiniz)</span></h3>
+              <span class="text-xs text-emerald-200/80" x-text="filteredAdminProducts.length + ' / ' + products.length + ' Ürün listeleniyor'"></span>
+            </div>
+
+            <!-- Yönetici Ürün Arama Çubuğu -->
+            <div class="relative w-full sm:w-64">
+              <input 
+                type="text" 
+                x-model="adminSearchQuery" 
+                placeholder="Katalogda ürün ara..." 
+                class="w-full bg-[#02160a] text-xs text-slate-100 placeholder-emerald-200/50 rounded-xl px-3 py-2 pl-8 border border-emerald-800 focus:outline-none focus:border-[#07C158]"
+              >
+              <svg class="w-4 h-4 text-emerald-300/70 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <button x-show="adminSearchQuery" @click="adminSearchQuery = ''" class="absolute right-2.5 top-2 text-slate-400 hover:text-white">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-200">
+              <thead class="bg-[#02160a]/80 text-emerald-200 uppercase tracking-wider border-b border-emerald-800">
+                <tr>
+                  <th class="p-3.5">Görsel (Tıkla & Yükle)</th>
+                  <th class="p-3.5">Ürün Adı</th>
+                  <th class="p-3.5">Kategori</th>
+                  <th class="p-3.5">Birim</th>
+                  <th class="p-3.5">Fiyat</th>
+                  <th class="p-3.5 text-right">İşlemler</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-emerald-800/60">
+                <template x-for="prod in filteredAdminProducts" :key="prod.id">
+                  <tr class="hover:bg-[#075928]/40 transition-colors" :class="editingProductId === prod.id ? 'bg-[#07C158]/20' : ''">
+                    <td class="p-3.5">
+                      <div class="relative group/img cursor-pointer inline-block" @click="triggerImageUpload(prod.id)" title="Tıkla: Bilgisayardan yeni resim seç">
+                        <img :src="prod.image" class="w-10 h-10 rounded-lg object-contain bg-[#02160a] p-1 border border-[#07C158]/40 group-hover/img:border-[#3bf088] transition-all" onerror="this.src='https://placehold.co/100x100/032611/07C158?text=Zeus'">
+                        <div class="absolute inset-0 bg-[#02160a]/80 rounded-lg opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
+                          <svg class="w-4 h-4 text-[#3bf088]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="p-3.5 font-medium text-white" x-text="prod.name"></td>
+                    <td class="p-3.5 text-[#3bf088]" x-text="prod.category"></td>
+                    <td class="p-3.5" x-text="prod.unit"></td>
+                    <td class="p-3.5 font-bold text-[#3bf088]" x-text="formatPrice(prod.price) + ' ₺'"></td>
+                    <td class="p-3.5 text-right space-x-1">
+                      <button @click="editProduct(prod)" class="px-2.5 py-1 bg-[#07C158]/20 hover:bg-[#07C158]/40 text-[#3bf088] rounded-lg text-[11px] border border-[#07C158]/40 transition-all font-medium">
+                        Düzenle
+                      </button>
+                      <button @click="deleteProduct(prod.id)" class="px-2.5 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg text-[11px] border border-red-500/30 transition-all">
+                        Sil
+                      </button>
+                    </td>
+                  </tr>
+                </template>
+                <template x-if="filteredAdminProducts.length === 0">
+                  <tr>
+                    <td colspan="6" class="p-6 text-center text-emerald-200/60">Aranan kriterlere uygun ürün bulunamadı.</td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 2: ORDERS MANAGEMENT -->
+      <div x-show="adminTab === 'orders'" class="space-y-4">
+        <template x-if="orders.length === 0">
+          <div class="text-center py-12 bg-[#042d14]/60 rounded-2xl border border-emerald-800">
+            <svg class="w-12 h-12 text-emerald-700 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            <p class="text-emerald-200/70 text-sm">Henüz verilmiş bir sipariş bulunmuyor.</p>
+          </div>
+        </template>
+
+        <template x-for="order in orders" :key="order.id">
+          <div class="bg-[#042d14]/90 rounded-2xl border border-emerald-800 p-5 space-y-4 shadow-xl">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-800/80 pb-3">
+              <div>
+                <span class="text-xs text-[#3bf088] font-bold" x-text="'Sipariş #' + order.id"></span>
+                <span class="text-xs text-emerald-200/70 ml-2" x-text="order.date"></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span :class="order.status === 'Hazırlanıyor' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-[#07C158]/20 text-[#3bf088] border-[#07C158]/40'" class="px-2.5 py-1 rounded-full text-xs font-semibold border">
+                  ● <span x-text="order.status"></span>
+                </span>
+                <button x-show="order.status === 'Hazırlanıyor'" @click="completeOrder(order.id)" class="px-3 py-1 bg-[#07C158] hover:bg-[#3bf088] text-slate-950 font-bold rounded-lg text-xs transition-all">
+                  Tamamlandı Yap
+                </button>
+              </div>
+            </div>
+
+            <!-- Customer & Payment Summary -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div>
+                <span class="text-emerald-200/70 block mb-0.5">Müşteri Bilgisi:</span>
+                <p class="font-bold text-white" x-text="order.customer.fullName"></p>
+                <p class="text-emerald-100" x-text="order.customer.phone"></p>
+              </div>
+              <div>
+                <span class="text-emerald-200/70 block mb-0.5">Teslimat Adresi:</span>
+                <p class="text-slate-100" x-text="order.customer.address"></p>
+              </div>
+              <div>
+                <span class="text-emerald-200/70 block mb-0.5">Ödeme Tipi & Tutar:</span>
+                <p class="font-bold text-[#3bf088]" x-text="order.paymentMethod"></p>
+                <p class="text-lg font-black text-white" x-text="formatPrice(order.totalAmount) + ' ₺'"></p>
+              </div>
+            </div>
+
+            <!-- Ordered Items List -->
+            <div class="bg-[#02160a]/80 rounded-xl p-3">
+              <span class="text-[11px] text-emerald-200/70 uppercase font-semibold block mb-2">Sipariş Edilen Ürünler</span>
+              <div class="flex flex-wrap gap-2">
+                <template x-for="item in order.items" :key="item.id">
+                  <div class="bg-[#05371a] px-3 py-1.5 rounded-lg border border-emerald-800 text-xs flex items-center gap-2">
+                    <span class="font-medium text-slate-100" x-text="item.name"></span>
+                    <span class="bg-[#07C158]/20 text-[#3bf088] px-1.5 py-0.5 rounded font-bold" x-text="item.qty + ' ' + item.unit"></span>
+                    <span class="text-emerald-200/80" x-text="formatPrice(item.price * item.qty) + ' ₺'"></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- FLOATING LIVE CART BAR -->
+  <div 
+    x-show="cart.length > 0 && currentTab === 'shop'" 
+    x-transition:enter="transition ease-out duration-300 transform translate-y-full"
+    x-transition:enter-start="translate-y-full"
+    x-transition:enter-end="translate-y-0"
+    x-transition:leave="transition ease-in duration-200 transform"
+    x-transition:leave-start="translate-y-0"
+    x-transition:leave-end="translate-y-full"
+    class="fixed bottom-0 left-0 right-0 z-30 bg-[#032611]/95 border-t border-[#07C158]/40 backdrop-blur-lg px-4 py-3 shadow-2xl"
+  >
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Cart Brief -->
+      <div class="flex items-center gap-3 cursor-pointer" @click="isCartOpen = true">
+        <div class="relative bg-[#07C158] text-slate-950 p-2.5 rounded-xl font-bold shadow-md shadow-[#07C158]/30">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+          </svg>
+          <span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-extrabold border-2 border-[#032611]" x-text="cartTotalCount()"></span>
+        </div>
+        <div>
+          <span class="text-xs text-emerald-200/80 uppercase tracking-wider font-semibold block">Toplam Tutar</span>
+          <div class="flex items-baseline gap-1">
+            <span class="text-xl font-black text-[#3bf088]" x-text="formatPrice(cartTotalAmount())"></span>
+            <span class="text-sm font-bold text-[#3bf088]">₺</span>
+            <span class="text-xs text-emerald-200/70 ml-1">('<span x-text="cartTotalCount()"></span> adet ürün')</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2">
+        <button 
+          @click="isCartOpen = true" 
+          class="hidden sm:inline-flex px-4 py-2.5 rounded-xl bg-[#05371a] hover:bg-[#084923] text-slate-100 text-xs font-semibold border border-emerald-800 transition-all"
+        >
+          Sepeti Gör
+        </button>
+
+        <button 
+          @click="openCheckout()" 
+          :disabled="cartTotalAmount() < 100"
+          :class="cartTotalAmount() < 100 ? 'opacity-50 cursor-not-allowed from-gray-600 to-gray-700' : 'from-[#07C158] to-[#059e47] hover:from-[#3bf088] hover:to-[#07C158] active:scale-95 shadow-lg shadow-[#07C158]/30'"
+          class="px-6 py-2.5 rounded-xl bg-gradient-to-r text-slate-950 font-extrabold text-sm flex items-center gap-2 transition-all"
+        >
+          <span>Ödemeye Geç</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CART SIDE MODAL / DRAWER -->
+  <div x-show="isCartOpen" class="fixed inset-0 z-50 overflow-hidden" x-cloak>
+    <div class="absolute inset-0 bg-[#02160a]/80 backdrop-blur-sm transition-opacity" @click="isCartOpen = false"></div>
+
+    <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+      <div class="w-screen max-w-md bg-[#032611] border-l border-emerald-800 shadow-2xl flex flex-col">
+        
+        <!-- Cart Drawer Header -->
+        <div class="p-4 sm:p-6 border-b border-emerald-800 flex items-center justify-between bg-[#02160a]/60">
+          <div class="flex items-center gap-2">
+            <svg class="w-6 h-6 text-[#3bf088]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <h2 class="text-lg font-extrabold text-white">Alışveriş Sepetim</h2>
+          </div>
+          <button @click="isCartOpen = false" class="text-slate-400 hover:text-white p-1 rounded-lg">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- Cart Items List -->
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+          <template x-if="cart.length === 0">
+            <div class="text-center py-16 space-y-3">
+              <div class="w-16 h-16 mx-auto rounded-full bg-[#05371a] flex items-center justify-center text-emerald-400">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>
+              </div>
+              <p class="text-emerald-100/80 font-medium">Sepetinizde henüz ürün yok.</p>
+              <button @click="isCartOpen = false" class="text-xs text-[#3bf088] font-bold hover:underline">Hemen Alışverişe Başla</button>
+            </div>
+          </template>
+
+          <template x-for="item in cart" :key="item.cartItemId">
+            <div class="bg-[#042d14]/80 rounded-xl p-3 border border-emerald-800/80 flex items-center justify-between gap-3">
+              <img :src="item.image" class="w-12 h-12 rounded-lg bg-[#02160a] object-contain p-1" onerror="this.src='https://placehold.co/100x100/032611/07C158?text=Zeus'">
+              
+              <div class="flex-1 min-w-0">
+                <h4 class="text-xs font-bold text-slate-100 truncate" x-text="item.name"></h4>
+                <div class="text-[11px] text-emerald-200/70">
+                  <span x-text="item.selectedGrammage ? item.selectedGrammage + 'g (' + formatPrice(item.unitPrice) + ' ₺)' : formatPrice(item.price) + ' ₺ / ' + item.unit"></span>
+                </div>
+                <div class="text-xs font-black text-[#3bf088] mt-0.5" x-text="formatPrice(item.unitPrice * item.qty) + ' ₺'"></div>
+              </div>
+
+              <!-- Quantity Controls -->
+              <div class="flex items-center bg-[#02160a] rounded-lg border border-emerald-800 p-0.5">
+                <button @click="removeFromCart(item.id, item.selectedGrammage)" class="w-6 h-6 rounded bg-[#05371a] text-[#3bf088] font-bold hover:bg-[#084923] text-xs">-</button>
+                <span class="w-6 text-center text-xs font-bold text-slate-100" x-text="item.qty"></span>
+                <button @click="addToCart(item)" class="w-6 h-6 rounded bg-[#07C158] text-slate-950 font-bold hover:bg-[#3bf088] text-xs">+</button>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- Cart Footer Summary -->
+        <div x-show="cart.length > 0" class="p-4 sm:p-6 border-t border-emerald-800 bg-[#02160a]/90 space-y-4">
+          
+          <!-- Min. Sipariş Uyarı Mesajı -->
+          <template x-if="cartSubtotalAmount() < 100">
+            <div class="p-2.5 rounded-xl bg-red-500/20 border border-red-500/40 text-red-300 text-xs text-center font-bold flex items-center justify-center gap-1.5 animate-pulse">
+              <svg class="w-4 h-4 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              <span>Siparişinizi minimum sipariş tutarına tamamlayınız!</span>
+            </div>
+          </template>
+
+          <div class="space-y-1.5 text-xs">
+            <div class="flex justify-between text-emerald-200/70">
+              <span>Ara Toplam</span>
+              <span class="text-slate-100" x-text="formatPrice(cartSubtotalAmount()) + ' ₺'"></span>
+            </div>
+            <div class="flex justify-between text-emerald-200/70">
+              <span>Teslimat Ücreti</span>
+              <span class="text-[#3bf088] font-semibold">100.00 ₺</span>
+            </div>
+            <div class="flex justify-between text-sm font-extrabold text-white pt-2 border-t border-emerald-800">
+              <span>Genel Toplam</span>
+              <span class="text-[#3bf088] text-base" x-text="formatPrice(cartTotalAmount()) + ' ₺'"></span>
+            </div>
+          </div>
+
+          <button 
+            @click="isCartOpen = false; openCheckout()" 
+            :disabled="cartSubtotalAmount() < 100"
+            :class="cartSubtotalAmount() < 100 ? 'opacity-50 cursor-not-allowed bg-slate-700 text-slate-400' : 'bg-[#07C158] hover:bg-[#3bf088] text-slate-950 shadow-lg shadow-[#07C158]/30'"
+            class="w-full py-3 rounded-xl font-extrabold text-sm transition-all text-center"
+          >
+            Siparişi Tamamla & Öde
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT MODAL (ÖDEME SAYFASI) -->
+  <div x-show="isCheckoutOpen" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
+    <div class="flex items-center justify-center min-h-screen px-4 py-8">
+      <div class="fixed inset-0 bg-[#02160a]/80 backdrop-blur-md transition-opacity" @click="isCheckoutOpen = false"></div>
+
+      <div class="relative bg-[#032611] border border-emerald-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl z-10">
+        
+        <!-- Modal Header -->
+        <div class="px-6 py-4 border-b border-emerald-800 flex items-center justify-between bg-[#02160a]/60">
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>🌿 Ödeme ve Teslimat Bilgileri</span>
+          </h3>
+          <button @click="isCheckoutOpen = false" class="text-slate-400 hover:text-white">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <form @submit.prevent="submitOrder()" class="p-6 space-y-6">
+          
+          <!-- Delivery Address Form -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-bold text-[#3bf088] uppercase tracking-wider">1. Teslimat Adresi</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-emerald-200/80 mb-1">Ad Soyad *</label>
+                <input type="text" x-model="checkoutForm.fullName" required placeholder="Ahmet Yılmaz" class="w-full bg-[#02160a] border border-emerald-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#07C158]">
+              </div>
+              <div>
+                <label class="block text-xs text-emerald-200/80 mb-1">Telefon Numarası *</label>
+                <input type="tel" x-model="checkoutForm.phone" required placeholder="0555 123 45 67" class="w-full bg-[#02160a] border border-emerald-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#07C158]">
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-xs text-emerald-200/80 mb-1">Açık Adres (Mahalle, Sokak, Bina No, Daire) *</label>
+                <textarea x-model="checkoutForm.address" required rows="2" placeholder="Atatürk Mah. Özgürlük Cad. No:12 D:4" class="w-full bg-[#02160a] border border-emerald-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#07C158]"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Options -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-bold text-[#3bf088] uppercase tracking-wider">2. Ödeme Yöntemi Seçin</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              
+              <!-- Option 1: Cash at Door -->
+              <label :class="checkoutForm.paymentMethod === 'Kapıda Nakit Ödeme' ? 'border-[#07C158] bg-[#07C158]/20' : 'border-emerald-800 bg-[#02160a]/60'" class="border rounded-xl p-3 cursor-pointer transition-all flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-bold text-slate-100">Kapıda Nakit</span>
+                  <input type="radio" value="Kapıda Nakit Ödeme" x-model="checkoutForm.paymentMethod" class="text-[#07C158] focus:ring-[#07C158]">
+                </div>
+                <span class="text-[11px] text-emerald-200/70">Sipariş tesliminde nakit ödeme yapın.</span>
+              </label>
+
+              <!-- Option 2: Card at Door -->
+              <label :class="checkoutForm.paymentMethod === 'Kapıda Kart ile Ödeme' ? 'border-[#07C158] bg-[#07C158]/20' : 'border-emerald-800 bg-[#02160a]/60'" class="border rounded-xl p-3 cursor-pointer transition-all flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-bold text-slate-100">Kapıda Kredi Kartı</span>
+                  <input type="radio" value="Kapıda Kart ile Ödeme" x-model="checkoutForm.paymentMethod" class="text-[#07C158] focus:ring-[#07C158]">
+                </div>
+                <span class="text-[11px] text-emerald-200/70">Kapıda POS cihazı ile ödeyin.</span>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- Total Order Calculation -->
+          <div class="bg-[#02160a] p-4 rounded-xl border border-emerald-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div>
+              <span class="text-xs text-emerald-200/70 block">Ödenecek Toplam Tutar (100 ₺ Teslimat Dahil)</span>
+              <span class="text-xl font-black text-[#3bf088]" x-text="formatPrice(cartTotalAmount()) + ' ₺'"></span>
+            </div>
+
+            <!-- Minimum Sipariş Uyarısı Modal İçi -->
+            <template x-if="cartSubtotalAmount() < 100">
+              <span class="text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/30 px-3 py-1.5 rounded-lg">
+                Siparişinizi minimum sipariş tutarına tamamlayınız!
+              </span>
+            </template>
+
+            <button 
+              type="submit" 
+              :disabled="cartSubtotalAmount() < 100"
+              :class="cartSubtotalAmount() < 100 ? 'opacity-50 cursor-not-allowed bg-slate-700 text-slate-400' : 'bg-gradient-to-r from-[#07C158] to-[#059e47] hover:from-[#3bf088] hover:to-[#07C158] text-slate-950 active:scale-95 shadow-lg shadow-[#07C158]/30'"
+              class="px-6 py-3 rounded-xl font-extrabold text-sm transition-all"
+            >
+              Siparişi Onayla
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDER SUCCESS MODAL -->
+  <div x-show="isSuccessOpen" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <div class="fixed inset-0 bg-[#02160a]/80 backdrop-blur-md"></div>
+      <div class="relative bg-[#032611] border border-[#07C158]/40 rounded-2xl p-6 text-center max-w-sm w-full z-10 shadow-2xl space-y-4">
+        <div class="w-16 h-16 bg-[#07C158]/20 rounded-full flex items-center justify-center mx-auto text-[#3bf088]">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <h3 class="text-xl font-extrabold text-white">Siparişiniz Alındı!</h3>
+        <p class="text-xs text-emerald-100/90">Zeus Market kuryeleri siparişinizi en kısa sürede adresinize ulaştıracaktır.</p>
+        <button @click="isSuccessOpen = false" class="w-full py-2.5 bg-[#07C158] hover:bg-[#3bf088] text-slate-950 font-bold rounded-xl text-xs transition-all">
+          Alışverişe Devam Et
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN AUTH MODAL -->
+  <div x-show="isAdminAuthOpen" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <div class="fixed inset-0 bg-[#02160a]/80 backdrop-blur-md" @click="isAdminAuthOpen = false"></div>
+
+      <div class="relative bg-[#032611] border border-emerald-800 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl z-10 p-6 space-y-4">
+        <div class="text-center">
+          <div class="w-12 h-12 rounded-xl bg-[#07C158]/20 border border-[#07C158]/40 text-[#3bf088] mx-auto flex items-center justify-center mb-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white">Yönetici Girişi</h3>
+          <p class="text-xs text-emerald-200/70">Devam etmek için yönetici kimliğinizi doğrulayın.</p>
+        </div>
+
+        <form @submit.prevent="loginAdmin()" class="space-y-3">
+          <div>
+            <label class="block text-xs text-emerald-200/80 mb-1">Kullanıcı Adı</label>
+            <input type="text" x-model="adminAuth.username" required placeholder="admin" class="w-full bg-[#02160a] border border-emerald-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#07C158]">
+          </div>
+          <div>
+            <label class="block text-xs text-emerald-200/80 mb-1">Şifre</label>
+            <input type="password" x-model="adminAuth.password" required placeholder="••••••••" class="w-full bg-[#02160a] border border-emerald-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#07C158]">
+          </div>
+
+          <div x-show="adminAuthErrorMessage" class="text-[11px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-2 text-center" x-text="adminAuthErrorMessage"></div>
+
+          <div class="pt-2 flex gap-2">
+            <button type="button" @click="isAdminAuthOpen = false" class="w-1/2 py-2 bg-[#05371a] text-slate-200 font-semibold rounded-xl text-xs hover:bg-[#084923] transition-all">İptal</button>
+            <button type="submit" class="w-1/2 py-2 bg-[#07C158] hover:bg-[#3bf088] text-slate-950 font-bold rounded-xl text-xs transition-all">Giriş Yap</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="mt-auto border-t border-emerald-900/60 bg-[#1A211D]/90 py-6 text-center">
+    <div class="max-w-7xl mx-auto px-4 space-y-1 text-xs text-emerald-200/80">
+      <p class="font-semibold text-[#3bf088]">Tasarım: Aşkın Altınel</p>
+      <p class="text-emerald-100/90">Bu bir DEMO sayfadır</p>
+      <p class="text-[11px] text-emerald-300/60 pt-1">© 2026 Zeus Market. Tüm hakları saklıdır.</p>
+    </div>
+  </footer>
+
+  <!-- ALPINE.JS LOGIC -->
+  <script>
+    function zeusApp() {
+      return {
+        // App Navigation & States
+        currentTab: 'shop', // 'shop' | 'admin'
+        adminTab: 'products', // 'products' | 'orders'
+        selectedCategory: 'Tümü',
+        searchQuery: '',
+        adminSearchQuery: '',
+        
+        // Modals
+        isCartOpen: false,
+        isCheckoutOpen: false,
+        isSuccessOpen: false,
+        isAdminAuthOpen: false,
+
+        // Auth State
+        isAdmin: false,
+        adminAuth: {
+          username: '',
+          password: ''
+        },
+        adminAuthErrorMessage: '',
+
+        // Selected grammage map for open products { productId: grammageInGrams }
+        productGrammages: {},
+
+        // Categories List with Subcategories
+        categories: [
+          { id: 1, name: 'Unlu Mamülleri', icon: '🍞' },
+          { id: 2, name: 'Süt Ürünleri', icon: '🥛' },
+          { id: 3, name: 'Tekel Ürünleri', icon: '🍾' },
+          { id: 4, name: 'Sigara', icon: '🚬' },
+          { 
+            id: 5, 
+            name: 'Çerezler', 
+            icon: '🥜', 
+            isOpen: false,
+            subcategories: ['Açık Çerezler', 'Kapalı Çerezler'] 
+          },
+          { id: 6, name: 'Atıştırmalıklar', icon: '🍫' },
+          { id: 7, name: 'Temel Gıdalar', icon: '🌾' },
+          { id: 8, name: 'İçecekler', icon: '🥤' }
+        ],
+
+        // Default Initial Products
+        products: [
+          { id: 1, name: 'Taze Ekmek', category: 'Unlu Mamülleri', price: 10.00, unit: 'Adet', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=300&q=80' },
+          { id: 2, name: 'Simit', category: 'Unlu Mamülleri', price: 15.00, unit: 'Adet', image: 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df?auto=format&fit=crop&w=300&q=80' },
+          { id: 3, name: 'Tam Yağlı Süt 1L', category: 'Süt Ürünleri', price: 34.50, unit: 'Litre', image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=300&q=80' },
+          { id: 4, name: 'Beyaz Peynir 500g', category: 'Süt Ürünleri', price: 120.00, unit: 'Paket', image: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=300&q=80' },
+          { id: 5, name: 'Taze Antep Fıstığı (Açık)', category: 'Açık Çerezler', price: 500.00, unit: 'Kg', isWeightProduct: true, image: 'https://images.unsplash.com/photo-1536591375315-1b83681e5e33?auto=format&fit=crop&w=300&q=80' },
+          { id: 6, name: 'Kavrulmuş Fındık (Açık)', category: 'Açık Çerezler', price: 380.00, unit: 'Kg', isWeightProduct: true, image: 'https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&w=300&q=80' },
+          { id: 7, name: 'Kaju Fıstığı (Açık)', category: 'Açık Çerezler', price: 420.00, unit: 'Kg', isWeightProduct: true, image: 'https://images.unsplash.com/photo-1509358271058-acd01cc9386a?auto=format&fit=crop&w=300&q=80' },
+          { id: 8, name: 'Paketli Ayçekirdeği 200g', category: 'Kapalı Çerezler', price: 30.00, unit: 'Paket', image: 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=300&q=80' },
+          { id: 9, name: 'Paketli Karışık Kuruyemiş', category: 'Kapalı Çerezler', price: 85.00, unit: 'Paket', image: 'https://images.unsplash.com/photo-1536591375315-1b83681e5e33?auto=format&fit=crop&w=300&q=80' },
+          { id: 10, name: 'Çikolatalı Gofret', category: 'Atıştırmalıklar', price: 12.50, unit: 'Adet', image: 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&w=300&q=80' },
+          { id: 11, name: 'Pilavlık Pirinç 1kg', category: 'Temel Gıdalar', price: 58.00, unit: 'Kg', image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=300&q=80' },
+          { id: 12, name: 'Ayçiçek Yağı 1L', category: 'Temel Gıdalar', price: 65.00, unit: 'Şişe', image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=300&q=80' },
+          { id: 13, name: 'Soğuk Çay Şeftali 1L', category: 'İçecekler', price: 28.00, unit: 'Şişe', image: 'https://images.unsplash.com/photo-1556881286-fc6915169721?auto=format&fit=crop&w=300&q=80' }
+        ],
+
+        // Cart State
+        cart: [],
+
+        // Admin Product Form State (Add / Edit)
+        isEditing: false,
+        editingProductId: null,
+        activeUploadProductId: null,
+        productForm: {
+          name: '',
+          category: 'Unlu Mamülleri',
+          price: '',
+          unit: 'Adet',
+          image: ''
+        },
+
+        // Checkout Form State
+        checkoutForm: {
+          fullName: '',
+          phone: '',
+          address: '',
+          paymentMethod: 'Kapıda Nakit Ödeme',
+          cardNumber: '',
+          cardExpiry: '',
+          cardCvc: ''
+        },
+
+        // Saved Orders List
+        orders: [],
+
+        // Initialization
+        initApp() {
+          const savedProducts = localStorage.getItem('zeus_products');
+          if (savedProducts) this.products = JSON.parse(savedProducts);
+
+          const savedOrders = localStorage.getItem('zeus_orders');
+          if (savedOrders) this.orders = JSON.parse(savedOrders);
+        },
+
+        // All selectable categories for Admin Panel
+        get allSelectableCategories() {
+          const list = [];
+          this.categories.forEach(c => {
+            if (c.subcategories) {
+              list.push(...c.subcategories);
+            } else {
+              list.push(c.name);
+            }
+          });
+          return list;
+        },
+
+        // Filtered Products Getter
+        get filteredProducts() {
+          return this.products.filter(product => {
+            let matchesCat = false;
+            if (this.selectedCategory === 'Tümü') {
+              matchesCat = true;
+            } else if (this.selectedCategory === 'Çerezler') {
+              matchesCat = product.category === 'Açık Çerezler' || product.category === 'Kapalı Çerezler';
+            } else {
+              matchesCat = product.category === this.selectedCategory;
+            }
+            const matchesSearch = product.name.toLowerCase().includes(this.searchQuery.toLowerCase());
+            return matchesCat && matchesSearch;
+          });
+        },
+
+        get filteredAdminProducts() {
+          if (!this.adminSearchQuery.trim()) return this.products;
+          const q = this.adminSearchQuery.toLowerCase();
+          return this.products.filter(product => 
+            product.name.toLowerCase().includes(q) || 
+            product.category.toLowerCase().includes(q)
+          );
+        },
+
+        getCategoryCount(catName) {
+          if (catName === 'Çerezler') {
+            return this.products.filter(p => p.category === 'Açık Çerezler' || p.category === 'Kapalı Çerezler').length;
+          }
+          return this.products.filter(p => p.category === catName).length;
+        },
+
+        // Grammage Helpers
+        getProductGrammage(productId) {
+          return this.productGrammages[productId] || 250; // Default 250g
+        },
+
+        setProductGrammage(productId, grams) {
+          this.productGrammages[productId] = Math.max(50, grams || 50);
+        },
+
+        calculateProductPrice(product) {
+          if (product.isWeightProduct || product.category === 'Açık Çerezler') {
+            const grams = this.getProductGrammage(product.id);
+            return (product.price * grams) / 1000;
+          }
+          return product.price;
+        },
+
+        // Cart Functions
+        addToCart(product) {
+          const isWeight = product.isWeightProduct || product.category === 'Açık Çerezler';
+          const selectedGrams = isWeight ? this.getProductGrammage(product.id) : null;
+          const calculatedPrice = isWeight ? (product.price * selectedGrams) / 1000 : product.price;
+          const cartItemId = isWeight ? `${product.id}_${selectedGrams}g` : `${product.id}`;
+
+          const existing = this.cart.find(item => item.cartItemId === cartItemId);
+          if (existing) {
+            existing.qty += 1;
+          } else {
+            this.cart.push({ 
+              ...product, 
+              cartItemId: cartItemId,
+              selectedGrammage: selectedGrams,
+              unitPrice: calculatedPrice,
+              qty: 1 
+            });
+          }
+        },
+
+        removeFromCart(productId, grammage = null) {
+          const cartItemId = grammage ? `${productId}_${grammage}g` : `${productId}`;
+          const index = this.cart.findIndex(item => item.cartItemId === cartItemId);
+          if (index !== -1) {
+            if (this.cart[index].qty > 1) {
+              this.cart[index].qty -= 1;
+            } else {
+              this.cart.splice(index, 1);
+            }
+          }
+        },
+
+        getItemQty(productId) {
+          return this.cart.filter(i => i.id === productId).reduce((sum, i) => sum + i.qty, 0);
+        },
+
+        cartSubtotalAmount() {
+          return this.cart.reduce((sum, item) => sum + (item.unitPrice * item.qty), 0);
+        },
+
+        cartTotalAmount() {
+          const subtotal = this.cartSubtotalAmount();
+          return subtotal > 0 ? subtotal + 100 : 0;
+        },
+
+        cartTotalCount() {
+          return this.cart.reduce((sum, item) => sum + item.qty, 0);
+        },
+
+        // Checkout Process
+        openCheckout() {
+          if (this.cart.length === 0 || this.cartSubtotalAmount() < 100) return;
+          this.isCheckoutOpen = true;
+        },
+
+        submitOrder() {
+          if (this.cart.length === 0 || this.cartSubtotalAmount() < 100) return;
+
+          const newOrder = {
+            id: Math.floor(100000 + Math.random() * 900000),
+            date: new Date().toLocaleString('tr-TR'),
+            customer: { ...this.checkoutForm },
+            paymentMethod: this.checkoutForm.paymentMethod,
+            items: [...this.cart],
+            totalAmount: this.cartTotalAmount(),
+            status: 'Hazırlanıyor'
+          };
+
+          this.orders.unshift(newOrder);
+          localStorage.setItem('zeus_orders', JSON.stringify(this.orders));
+
+          // Reset cart & open success modal securely
+          this.cart = [];
+          this.isCheckoutOpen = false;
+          
+          setTimeout(() => {
+            this.isSuccessOpen = true;
+          }, 50);
+
+          this.checkoutForm.cardNumber = '';
+          this.checkoutForm.cardExpiry = '';
+          this.checkoutForm.cardCvc = '';
+        },
+
+        // Admin Auth
+        openAdminAuthModal() {
+          this.adminAuth.username = '';
+          this.adminAuth.password = '';
+          this.adminAuthErrorMessage = '';
+          this.isAdminAuthOpen = true;
+        },
+
+        loginAdmin() {
+          if (this.adminAuth.username === 'admin' && this.adminAuth.password === 'admin123') {
+            this.isAdmin = true;
+            this.isAdminAuthOpen = false;
+            this.currentTab = 'admin';
+          } else {
+            this.adminAuthErrorMessage = 'Kullanıcı adı veya şifre hatalı!';
+          }
+        },
+
+        logoutAdmin() {
+          this.isAdmin = false;
+          this.currentTab = 'shop';
+        },
+
+        // File Reading Helpers for Local Images
+        uploadFormImage(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            this.productForm.image = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        },
+
+        triggerImageUpload(productId) {
+          this.activeUploadProductId = productId;
+          const fileInput = document.getElementById('tableFileInput');
+          if (fileInput) fileInput.click();
+        },
+
+        handleTableFileChange(event) {
+          const file = event.target.files[0];
+          if (!file || !this.activeUploadProductId) return;
+
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const base64Img = e.target.result;
+            const index = this.products.findIndex(p => p.id === this.activeUploadProductId);
+            if (index !== -1) {
+              this.products[index].image = base64Img;
+              localStorage.setItem('zeus_products', JSON.stringify(this.products));
+            }
+            if (this.editingProductId === this.activeUploadProductId) {
+              this.productForm.image = base64Img;
+            }
+            this.activeUploadProductId = null;
+            event.target.value = '';
+          };
+          reader.readAsDataURL(file);
+        },
+
+        // Admin Product Management
+        saveProduct() {
+          if (!this.productForm.name || !this.productForm.price) return;
+
+          const defaultImg = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80';
+          const imageUrl = this.productForm.image.trim() || defaultImg;
+          const isWeight = this.productForm.category === 'Açık Çerezler';
+
+          if (this.isEditing && this.editingProductId) {
+            const index = this.products.findIndex(p => p.id === this.editingProductId);
+            if (index !== -1) {
+              this.products[index] = {
+                ...this.products[index],
+                name: this.productForm.name,
+                category: this.productForm.category,
+                price: parseFloat(this.productForm.price),
+                unit: this.productForm.unit || (isWeight ? 'Kg' : 'Adet'),
+                isWeightProduct: isWeight,
+                image: imageUrl
+              };
+            }
+          } else {
+            const created = {
+              id: Date.now(),
+              name: this.productForm.name,
+              category: this.productForm.category,
+              price: parseFloat(this.productForm.price),
+              unit: this.productForm.unit || (isWeight ? 'Kg' : 'Adet'),
+              isWeightProduct: isWeight,
+              image: imageUrl
+            };
+            this.products.unshift(created);
+          }
+
+          localStorage.setItem('zeus_products', JSON.stringify(this.products));
+          this.cancelEdit();
+        },
+
+        editProduct(prod) {
+          this.isEditing = true;
+          this.editingProductId = prod.id;
+          this.productForm = {
+            name: prod.name,
+            category: prod.category,
+            price: prod.price,
+            unit: prod.unit,
+            image: prod.image || ''
+          };
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+
+        cancelEdit() {
+          this.isEditing = false;
+          this.editingProductId = null;
+          this.productForm = {
+            name: '',
+            category: 'Unlu Mamülleri',
+            price: '',
+            unit: 'Adet',
+            image: ''
+          };
+        },
+
+        deleteProduct(id) {
+          this.products = this.products.filter(p => p.id !== id);
+          if (this.editingProductId === id) this.cancelEdit();
+          localStorage.setItem('zeus_products', JSON.stringify(this.products));
+        },
+
+        completeOrder(orderId) {
+          const ord = this.orders.find(o => o.id === orderId);
+          if (ord) {
+            ord.status = 'Teslim Edildi';
+            localStorage.setItem('zeus_orders', JSON.stringify(this.orders));
+          }
+        },
+
+        get pendingOrdersCount() {
+          return this.orders.filter(o => o.status === 'Hazırlanıyor').length;
+        },
+
+        // Helpers
+        formatPrice(val) {
+          return Number(val).toFixed(2);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
